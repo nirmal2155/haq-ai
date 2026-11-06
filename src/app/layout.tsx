@@ -82,12 +82,20 @@ export default function RootLayout({
 
         {/* Footer */}
         <footer className="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-600">
-          <div className="max-w-7xl mx-auto px-4 space-y-2">
-            <p>
-              Haq AI — Built for Startup Buildathon India 2026. Empowering Micro & Small Enterprises across India.
-            </p>
-            <p className="text-slate-500">
-              Deterministic calculations based on MSMED Act 2006 Section 15 & 16. No AI touches legal dates or money math.
+          <div className="max-w-7xl mx-auto px-4 space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/tech_titans_logo.jpg"
+                alt="Tech Titans Logo"
+                className="w-6 h-6 rounded-full object-cover border border-slate-300"
+              />
+              <span className="font-semibold text-slate-800">
+                Built by <span className="text-emerald-700 font-bold">Team Tech Titans</span> · Startup Buildathon India 2026
+              </span>
+            </div>
+            <p className="text-slate-500 max-w-2xl mx-auto">
+              Empowering India&apos;s Micro &amp; Small Enterprises with deterministic legal-math under MSMED Act 2006 (Sections 15 &amp; 16) and Income Tax Section 43B(h).
             </p>
           </div>
         </footer>
