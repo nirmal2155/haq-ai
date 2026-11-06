@@ -1,0 +1,17 @@
+{
+  "app_title": "हक़ AI",
+  "app_subtitle": "MSMED अधिनियम के तहत सांविधिक भुगतान अधिकार एवं धारा 43B(h) जोखिम ट्रैकर",
+  "disclaimer": "केवल ड्राफ्ट। भेजने से पहले सीए/वकील से समीक्षा करवाएं।",
+  "legal_notice": "हक़ AI एक ड्राफ्टिंग और निर्णय-सहायता टूल है, कानूनी सलाह नहीं।",
+  "nav_dashboard": "सप्लायर डैशबोर्ड",
+  "nav_buyer": "खरीदार जोखिम (43B(h))",
+  "nav_new_invoice": "चालान अपलोड करें",
+  "nav_login": "लॉग इन करें",
+  "nav_logout": "लॉग आउट",
+  "total_overdue": "कुल बकाया",
+  "total_interest": "अर्जित सांविधिक ब्याज",
+  "days_overdue": "दिन की देरी",
+  "action_generate_notice": "कानूनी नोटिस बनाएं",
+  "action_samadhaan_kit": "MSME समाधान किट",
+  "action_voice_call": "AI सुलह कॉल"
+}

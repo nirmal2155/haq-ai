@@ -1,0 +1,17 @@
+{
+  "app_title": "Haq AI",
+  "app_subtitle": "Statutory MSME Payment Rights & Section 43B(h) Exposure Tracker",
+  "disclaimer": "Draft only. Review with a CA/lawyer before sending.",
+  "legal_notice": "Haq AI is a drafting and decision-support tool, not legal advice.",
+  "nav_dashboard": "Supplier Dashboard",
+  "nav_buyer": "Buyer Exposure",
+  "nav_new_invoice": "Upload Invoice",
+  "nav_login": "Sign In",
+  "nav_logout": "Sign Out",
+  "total_overdue": "Total Overdue",
+  "total_interest": "Accrued Statutory Interest",
+  "days_overdue": "Days Overdue",
+  "action_generate_notice": "Draft Legal Notice",
+  "action_samadhaan_kit": "MSME Samadhaan Kit",
+  "action_voice_call": "AI Settlement Call"
+}

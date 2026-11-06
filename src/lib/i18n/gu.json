@@ -1,0 +1,17 @@
+{
+  "app_title": "હક AI",
+  "app_subtitle": "MSMED એક્ટ હેઠળ કાનૂની ચુકવણી હકો અને કલમ 43B(h) જોખમ ટ્રેકર",
+  "disclaimer": "માત્ર ડ્રાફ્ટ. મોકલતા પહેલા CA/વકીલ સાથે સમીક્ષા કરો.",
+  "legal_notice": "હક AI એ ડ્રાફ્ટિંગ અને નિર્ણય-સહાયક સાધન છે, કાનૂની સલાહ નથી.",
+  "nav_dashboard": "સપ્લાયર ડેશબોર્ડ",
+  "nav_buyer": "ખરીદદાર જોખમ (43B(h))",
+  "nav_new_invoice": "ઇન્વૉઇસ અપલોડ કરો",
+  "nav_login": "સાઇન ઇન",
+  "nav_logout": "સાઇન આઉટ",
+  "total_overdue": "કુલ બાકી રકમ",
+  "total_interest": "કાનૂની વ્યાજ",
+  "days_overdue": "મોડા દિવસો",
+  "action_generate_notice": "કાનૂની નોટિસ બનાવો",
+  "action_samadhaan_kit": "MSME સમાધાન કિટ",
+  "action_voice_call": "AI સમાધાન કૉલ"
+}
