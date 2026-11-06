@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Upload, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '@/lib/useAuth';
 
 interface UploadCardProps {
   onExtractionSuccess: (extractedData: any, source: any) => void;
@@ -12,6 +13,7 @@ export function UploadCard({ onExtractionSuccess }: UploadCardProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { getAuthHeader } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -37,14 +39,10 @@ export function UploadCard({ onExtractionSuccess }: UploadCardProps) {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // In client mode, attach auth token if available, or demo test token
-      const token = 'test-token-supplier_demo';
-
+      // In client mode, attach real Firebase ID token or demo fallback
       const res = await fetch('/api/extract', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: await getAuthHeader(),
         body: formData,
       });
 

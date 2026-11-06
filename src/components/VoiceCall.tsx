@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Phone, PhoneOff, Mic, ShieldCheck, ShieldAlert, MessageSquare, Check, Sparkles } from 'lucide-react';
+import { useAuth } from '@/lib/useAuth';
 
 interface VoiceCallProps {
   invoiceId: string;
@@ -30,6 +31,7 @@ export function VoiceCall({ invoiceId, context, onCallEnded }: VoiceCallProps) {
   const [callEnded, setCallEnded] = useState(false);
   const [savingRecord, setSavingRecord] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const { getAuthHeader } = useAuth();
 
   // Fallback text input for interactive roleplay
   const [buyerInput, setBuyerInput] = useState('');
@@ -128,7 +130,7 @@ export function VoiceCall({ invoiceId, context, onCallEnded }: VoiceCallProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer test-token-supplier_demo',
+          ...(await getAuthHeader()),
         },
         body: JSON.stringify({
           invoiceId,

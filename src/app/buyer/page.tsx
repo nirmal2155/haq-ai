@@ -5,7 +5,7 @@ import { RiskTable, BuyerInvoiceItem } from '@/components/RiskTable';
 import { SEED_DATA, SeedInvoice } from '@/lib/seedData';
 import { computeDueDate } from '@/engine/deadline';
 import { computeInterest, DEFAULT_LEGAL_CONFIG } from '@/engine/interest';
-import { Building2, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 
 export default function BuyerRiskPage() {
   const [selectedBuyer, setSelectedBuyer] = useState<'buyer_apex' | 'buyer_zenith'>('buyer_apex');

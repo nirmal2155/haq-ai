@@ -5,11 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import { NoticePreview } from '@/components/NoticePreview';
+import { useAuth } from '@/lib/useAuth';
 
 export default function NoticePage() {
   const params = useParams();
   const router = useRouter();
   const invoiceId = params.id as string;
+  const { getAuthHeader } = useAuth();
 
   const [lang, setLang] = useState<'en' | 'hi' | 'gu'>('en');
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function NoticePage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer test-token-supplier_demo',
+          ...(await getAuthHeader()),
         },
         body: JSON.stringify({
           invoiceId,
@@ -56,7 +58,7 @@ export default function NoticePage() {
     } finally {
       setLoading(false);
     }
-  }, [invoiceId]);
+  }, [invoiceId, getAuthHeader]);
 
   useEffect(() => {
     if (invoiceId) {

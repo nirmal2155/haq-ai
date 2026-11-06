@@ -3,12 +3,15 @@
  * and dangerous markup execution.
  */
 
-export function sanitizeText(input: unknown): string {
+export function sanitizeText(input: unknown, maxLength = 10000): string {
   if (typeof input !== 'string') {
     return '';
   }
 
-  return input
+  // Prevent resource exhaustion from oversized payload strings
+  const bounded = input.length > maxLength ? input.slice(0, maxLength) : input;
+
+  return bounded
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

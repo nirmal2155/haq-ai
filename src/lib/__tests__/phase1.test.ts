@@ -110,3 +110,20 @@ describe('Phase 1 - Security, Storage & Auth Tests', () => {
     });
   });
 });
+
+describe('sanitizeText edge cases', () => {
+  it('handles empty string', () => {
+    // sanitizeText('') should return '' without throwing
+    expect(sanitizeText('')).toBe('');
+  });
+
+  it('strips HTML tags', () => {
+    expect(sanitizeText('<b>bold</b>')).not.toContain('<b>');
+  });
+
+  it('truncates long strings at 10000 chars', () => {
+    const longStr = 'a'.repeat(15000);
+    const result = sanitizeText(longStr);
+    expect(result.length).toBeLessThanOrEqual(10001); // allow for ellipsis
+  });
+});

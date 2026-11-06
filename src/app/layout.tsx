@@ -1,12 +1,18 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { AuthProvider } from '@/lib/useAuth';
 
 export const metadata: Metadata = {
   title: 'Haq AI — MSME Statutory Payment Rights & Section 43B(h)',
   description:
     'Haq AI helps Indian micro and small suppliers enforce statutory payment rights under the MSMED Act and tracks Section 43B(h) buyer risk.',
+  manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#059669',
 };
 
 export default function RootLayout({
@@ -57,14 +63,22 @@ export default function RootLayout({
               >
                 + Upload Invoice
               </Link>
+              <Link
+                href="/login"
+                className="text-slate-300 hover:text-white text-xs transition-colors"
+              >
+                Sign In
+              </Link>
             </nav>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {children}
-        </main>
+        <AuthProvider>
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            {children}
+          </main>
+        </AuthProvider>
 
         {/* Footer */}
         <footer className="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-600">

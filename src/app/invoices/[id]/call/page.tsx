@@ -5,10 +5,12 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { VoiceCall } from '@/components/VoiceCall';
+import { useAuth } from '@/lib/useAuth';
 
 export default function VoiceCallPage() {
   const params = useParams();
   const invoiceId = params.id as string;
+  const { getAuthHeader } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [tokenData, setTokenData] = useState<{
@@ -33,7 +35,7 @@ export default function VoiceCallPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer test-token-supplier_demo',
+            ...(await getAuthHeader()),
           },
           body: JSON.stringify({
             invoiceId,
@@ -57,7 +59,7 @@ export default function VoiceCallPage() {
     if (invoiceId) {
       fetchLiveToken();
     }
-  }, [invoiceId]);
+  }, [invoiceId, getAuthHeader]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

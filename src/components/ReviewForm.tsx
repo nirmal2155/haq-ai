@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AlertTriangle, Check, ShieldAlert } from 'lucide-react';
 import { computeDueDate } from '@/engine/deadline';
 import { rupeesToPaise, formatPaiseToINR } from '@/engine/money';
+import { useAuth } from '@/lib/useAuth';
 
 interface ReviewFormProps {
   initialData: {
@@ -28,6 +29,7 @@ interface ReviewFormProps {
 
 export function ReviewForm({ initialData, source }: ReviewFormProps) {
   const router = useRouter();
+  const { getAuthHeader } = useAuth();
   const [formData, setFormData] = useState({
     buyerName: initialData.buyerName || '',
     buyerGstin: initialData.buyerGstin || '',
@@ -86,7 +88,7 @@ export function ReviewForm({ initialData, source }: ReviewFormProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer test-token-supplier_demo',
+          ...(await getAuthHeader()),
         },
         body: JSON.stringify(payload),
       });

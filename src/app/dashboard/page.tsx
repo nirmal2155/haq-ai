@@ -17,6 +17,7 @@ import {
 import en from '@/lib/i18n/en.json';
 import hi from '@/lib/i18n/hi.json';
 import gu from '@/lib/i18n/gu.json';
+import { useAuth } from '@/lib/useAuth';
 
 interface InvoiceSummary {
   id: string;
@@ -41,6 +42,7 @@ export default function SupplierDashboardPage() {
   const [invoices, setInvoices] = useState<InvoiceSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { getAuthHeader } = useAuth();
 
   const t = translations[lang];
 
@@ -49,9 +51,7 @@ export default function SupplierDashboardPage() {
       try {
         setLoading(true);
         const res = await fetch('/api/invoices', {
-          headers: {
-            Authorization: 'Bearer test-token-supplier_demo',
-          },
+          headers: await getAuthHeader(),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -119,7 +119,7 @@ export default function SupplierDashboardPage() {
     }
 
     fetchInvoices();
-  }, []);
+  }, [getAuthHeader]);
 
   const totalOverduePrincipal = invoices
     .filter((inv) => inv.daysOverdue > 0)
