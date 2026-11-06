@@ -86,12 +86,12 @@ export default function RootLayout({
             <div className="flex items-center justify-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/tech_titans_logo.jpg"
-                alt="Tech Titans Logo"
+                src="/tech_titan_logo.jpg"
+                alt="Tech Titan Logo"
                 className="w-6 h-6 rounded-full object-cover border border-slate-300"
               />
               <span className="font-semibold text-slate-800">
-                Built by <span className="text-emerald-700 font-bold">Team Tech Titans</span> · Startup Buildathon India 2026
+                Built by <span className="text-emerald-700 font-bold">Team Tech Titan</span> · Startup Buildathon India 2026
               </span>
             </div>
             <p className="text-slate-500 max-w-2xl mx-auto">
