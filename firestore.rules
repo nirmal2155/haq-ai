@@ -1,52 +1,592 @@
 rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: userId (matches auth.uid)
+// Fields:
+//   - id: string (optional, matches auth.uid)
+//   - email: string (optional, valid email format, max 100 chars)
+//   - businessName: string (optional, max 200 chars)
+//   - name: string (optional, max 200 chars)
+//   - udyamNumber / udyamNo: string (optional, max 30 chars)
+//   - enterpriseType: string (optional, 'micro' | 'small' | 'medium')
+//   - gstin: string (optional, max 15 chars)
+//   - phone: string (optional, max 20 chars)
+//   - orgId: string (optional, immutable on update, max 100 chars)
+//   - role: string (optional, immutable on update, 'owner' | 'user' | 'client')
+//   - lang: string (optional, 'en' | 'hi' | 'gu')
+//   - createdAt: string (optional, immutable on update, max 50 chars)
+//   - updatedAt: string (optional, max 50 chars)
+//
+// Collection: cases
+// Document ID: caseId
+// Fields:
+//   - id: string (required, immutable on update, max 100 chars)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - invoiceId: string (required, immutable on update, max 100 chars)
+//   - state: string (required, 'DRAFT' | 'ELIGIBILITY_CHECKED' | ... | 'CLOSED')
+//   - principalAmountPaise: int (required, >= 0)
+//   - paidAmountPaise: int (required, >= 0)
+//   - accruedInterestPaise: int (required, >= 0, COMPUTED - immutable on client update)
+//   - totalClaimPaise: int (required, >= 0, COMPUTED - immutable on client update)
+//   - statutoryCapDays: int (required, > 0 and <= 365)
+//   - appointedDay: string (required, max 20 chars)
+//   - daysOverdue: int (required, >= 0, COMPUTED - immutable on client update)
+//   - buyerName: string (required, max 200 chars)
+//   - buyerGstin: string | null (optional, max 15 chars)
+//   - invoiceNumber: string (required, max 100 chars)
+//   - invoiceDate: string (required, max 20 chars)
+//   - deliveryDate: string | null (optional, max 20 chars)
+//   - acceptanceDate: string | null (optional, max 20 chars)
+//   - isDeemedAcceptance: bool (required)
+//   - hasDispute: bool (required)
+//   - disputeNotes: string | null (optional, max 2000 chars)
+//   - lastIdempotencyKey: string | null (optional, max 128 chars)
+//   - createdAt: string (required, immutable on update, max 50 chars)
+//   - updatedAt: string (required, max 50 chars)
+//
+// Collection: caseEvents
+// Document ID: eventId
+// Fields:
+//   - id: string (required, max 100 chars)
+//   - caseId: string (required, references cases/{caseId})
+//   - actor: map (required)
+//   - type: string (required)
+//   - fromState: string | null
+//   - toState: string
+//   - timestamp: string
+//   - payloadHash: string
+//   - idempotencyKey: string
+//   - metadata: map (optional)
+// Write access: Strictly server-only (allow write: if false).
+// Read access: Allowed only if user owns the related case in /cases/{caseId}.
+//
+// Collection: reminders
+// Document ID: reminderId
+// Fields:
+//   - id: string (required, immutable on update, max 100 chars)
+//   - caseId: string (required, immutable on update, max 100 chars)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - trigger: string (required, 'before_due' | 'on_appointed_day' | ...)
+//   - scheduledFor: string (required, max 50 chars)
+//   - status: string (required, 'pending' | 'approved' | 'sent' | 'cancelled')
+//   - channel: string (required, 'email' | 'whatsapp' | 'sms')
+//   - templateName: string (optional, max 100 chars)
+//   - approvedAt: string | null (optional, max 50 chars)
+//   - sentAt: string | null (optional, max 50 chars)
+//   - idempotencyKey: string (optional, max 128 chars)
+//   - createdAt: string (optional, immutable on update, max 50 chars)
+//   - updatedAt: string (optional, max 50 chars)
+//
+// Collection: evidence
+// Document ID: evidenceId
+// Fields:
+//   - id: string (required, immutable on update, max 100 chars)
+//   - caseId: string (required, immutable on update, max 100 chars)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - name: string (required, max 200 chars)
+//   - storagePath: string (required, immutable on update, max 500 chars)
+//   - sha256: string (required, immutable on update, 64 chars)
+//   - mimeType: string (required, max 100 chars)
+//   - sizeBytes: int (required, >= 0 and <= 10485760 bytes)
+//   - magicBytesVerified: bool (required)
+//   - uploadedAt: string (required, immutable on update, max 50 chars)
+//
+// Collection: inboundEmails
+// Document ID: emailId
+// Write & Read: Server-side only (allow read, write: if false)
+//
+// Collection: rateTable
+// Document ID: rateId
+// Write: Server-side only (allow write: if false)
+// Read: Authenticated users (request.auth != null)
+//
+// Collection: invoices
+// Document ID: invoiceId
+// Fields:
+//   - id: string (optional, immutable on update)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - orgId: string (optional, max 100 chars)
+//   - buyerName: string (required, max 200 chars)
+//   - buyerGstin: string | null (optional, max 15 chars)
+//   - invoiceNo: string (required, max 100 chars)
+//   - invoiceDate: string (required, max 20 chars)
+//   - acceptanceDate: string (required, max 20 chars)
+//   - deemedAcceptance: bool (optional)
+//   - amountPaise: int (required, > 0)
+//   - paidPaise: int (optional, >= 0)
+//   - hasWrittenAgreement: bool (optional)
+//   - agreedCreditDays: int | null (optional, 0..365)
+//   - statutoryDueDate: string (optional, max 20 chars)
+//   - statutoryRule: string (optional, max 100 chars)
+//   - status: string (optional, 'pending' | 'partially_paid' | 'overdue' | 'paid')
+//   - source: map (optional)
+//   - supplierName: string (optional, max 200 chars)
+//   - createdAt: string (optional, immutable on update, max 50 chars)
+//
+// Collection: notices
+// Document ID: noticeId
+// Fields:
+//   - id: string (optional, immutable on update)
+//   - invoiceId: string (required, immutable on update, max 100 chars)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - orgId: string (optional, max 100 chars)
+//   - lang: string (required, 'en' | 'hi' | 'gu')
+//   - bodyEn: string (required, max 20000 chars)
+//   - finalBody: string (required, max 20000 chars)
+//   - summaryLocal: string | null (optional, max 5000 chars)
+//   - fallbackUsed: bool (optional)
+//   - disclaimer: string (required, max 500 chars)
+//   - createdAt: string (required, immutable on update, max 50 chars)
+//
+// Collection: calls
+// Document ID: callId
+// Fields:
+//   - id: string (optional, immutable on update)
+//   - invoiceId: string (required, immutable on update, max 100 chars)
+//   - ownerUid: string (required, immutable on update, matches auth.uid)
+//   - orgId: string (optional, max 100 chars)
+//   - consentGiven: bool (required)
+//   - transcript: string | null (optional, max 20000 chars)
+//   - promisedDate: string | null (optional, max 100 chars)
+//   - createdAt: string (required, immutable on update, max 50 chars)
+//
+// Collection: auditLogs
+// Write & Read: Server-side only (allow read, write: if false)
+//
+// Collection: rateLimits
+// Write & Read: Server-side only (allow read, write: if false)
+//
+// Collection: orgs
+// Document ID: orgId
+// Owner-only read/write
+// ===============================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if request is authenticated
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Helper function to verify user owns the document
     function isOwner(uid) {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Default deny all access
-    match /{document=**} {
-      allow read, write: if false;
+    function isValidEmail(email) {
+      return email is string &&
+        email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+[.][a-zA-Z]{2,}$");
     }
+
+    function ownsRelatedCase(caseId) {
+      return isAuthenticated() &&
+        caseId is string &&
+        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        get(/databases/$(database)/documents/cases/$(caseId)).data.ownerUid == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // --- Users ---
+    function isValidUser(data) {
+      let allowedKeys = [
+        'id', 'email', 'businessName', 'name', 'udyamNumber', 'udyamNo',
+        'enterpriseType', 'gstin', 'phone', 'orgId', 'role', 'lang',
+        'createdAt', 'updatedAt'
+      ];
+      return data.keys().hasOnly(allowedKeys) &&
+        (!('id' in data) || (data.id is string && data.id == request.auth.uid && data.id.size() <= 128)) &&
+        (!('email' in data) || (data.email is string && data.email.size() > 0 && data.email.size() <= 100 && isValidEmail(data.email))) &&
+        (!('businessName' in data) || (data.businessName is string && data.businessName.size() > 0 && data.businessName.size() <= 200)) &&
+        (!('name' in data) || (data.name is string && data.name.size() > 0 && data.name.size() <= 200)) &&
+        (!('udyamNumber' in data) || data.udyamNumber == null || (data.udyamNumber is string && data.udyamNumber.size() <= 30)) &&
+        (!('udyamNo' in data) || data.udyamNo == null || (data.udyamNo is string && data.udyamNo.size() <= 30)) &&
+        (!('enterpriseType' in data) || (data.enterpriseType is string && data.enterpriseType in ['micro', 'small', 'medium'])) &&
+        (!('gstin' in data) || data.gstin == null || (data.gstin is string && data.gstin.size() <= 15)) &&
+        (!('phone' in data) || data.phone == null || (data.phone is string && data.phone.size() <= 20)) &&
+        (!('orgId' in data) || (data.orgId is string && data.orgId.size() > 0 && data.orgId.size() <= 100)) &&
+        (!('role' in data) || (data.role is string && data.role in ['owner', 'user', 'client'])) &&
+        (!('lang' in data) || (data.lang is string && data.lang in ['en', 'hi', 'gu'])) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function areImmutableUserFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'createdAt', 'id', 'orgId']);
+    }
+
+    // --- Cases ---
+    function isValidCase(data) {
+      let allowedKeys = [
+        'id', 'ownerUid', 'invoiceId', 'state', 'principalAmountPaise',
+        'paidAmountPaise', 'accruedInterestPaise', 'totalClaimPaise',
+        'statutoryCapDays', 'appointedDay', 'daysOverdue', 'buyerName',
+        'buyerGstin', 'invoiceNumber', 'invoiceDate', 'deliveryDate',
+        'acceptanceDate', 'isDeemedAcceptance', 'hasDispute', 'disputeNotes',
+        'lastIdempotencyKey', 'createdAt', 'updatedAt'
+      ];
+      let requiredKeys = [
+        'id', 'ownerUid', 'invoiceId', 'state', 'principalAmountPaise',
+        'paidAmountPaise', 'accruedInterestPaise', 'totalClaimPaise',
+        'statutoryCapDays', 'appointedDay', 'daysOverdue', 'buyerName',
+        'invoiceNumber', 'invoiceDate', 'isDeemedAcceptance', 'hasDispute',
+        'createdAt', 'updatedAt'
+      ];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 100 &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        data.invoiceId is string && data.invoiceId.size() > 0 && data.invoiceId.size() <= 100 &&
+        data.state is string && data.state in [
+          'DRAFT', 'ELIGIBILITY_CHECKED', 'TRACKING', 'REMINDER_DUE',
+          'REMINDER_APPROVED', 'REMINDER_SENT', 'NOTICE_DRAFTED',
+          'NOTICE_SENT_BY_USER', 'PAID', 'CLOSED', 'INELIGIBLE'
+        ] &&
+        data.principalAmountPaise is int && data.principalAmountPaise >= 0 &&
+        data.paidAmountPaise is int && data.paidAmountPaise >= 0 &&
+        data.accruedInterestPaise is int && data.accruedInterestPaise >= 0 &&
+        data.totalClaimPaise is int && data.totalClaimPaise >= 0 &&
+        data.statutoryCapDays is int && data.statutoryCapDays > 0 && data.statutoryCapDays <= 365 &&
+        data.appointedDay is string && data.appointedDay.size() <= 20 &&
+        data.daysOverdue is int && data.daysOverdue >= 0 &&
+        data.buyerName is string && data.buyerName.size() > 0 && data.buyerName.size() <= 200 &&
+        (!('buyerGstin' in data) || data.buyerGstin == null || (data.buyerGstin is string && data.buyerGstin.size() <= 15)) &&
+        data.invoiceNumber is string && data.invoiceNumber.size() > 0 && data.invoiceNumber.size() <= 100 &&
+        data.invoiceDate is string && data.invoiceDate.size() <= 20 &&
+        (!('deliveryDate' in data) || data.deliveryDate == null || (data.deliveryDate is string && data.deliveryDate.size() <= 20)) &&
+        (!('acceptanceDate' in data) || data.acceptanceDate == null || (data.acceptanceDate is string && data.acceptanceDate.size() <= 20)) &&
+        data.isDeemedAcceptance is bool &&
+        data.hasDispute is bool &&
+        (!('disputeNotes' in data) || data.disputeNotes == null || (data.disputeNotes is string && data.disputeNotes.size() <= 2000)) &&
+        (!('lastIdempotencyKey' in data) || data.lastIdempotencyKey == null || (data.lastIdempotencyKey is string && data.lastIdempotencyKey.size() <= 128)) &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        data.updatedAt is string && data.updatedAt.size() <= 50;
+    }
+
+    function areCaseImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'id', 'ownerUid', 'invoiceId', 'createdAt',
+        'accruedInterestPaise', 'totalClaimPaise', 'daysOverdue'
+      ]);
+    }
+
+    // --- Reminders ---
+    function isValidReminder(data) {
+      let allowedKeys = [
+        'id', 'caseId', 'ownerUid', 'trigger', 'scheduledFor', 'status',
+        'channel', 'templateName', 'approvedAt', 'sentAt', 'idempotencyKey',
+        'createdAt', 'updatedAt'
+      ];
+      let requiredKeys = ['id', 'caseId', 'ownerUid', 'trigger', 'scheduledFor', 'status', 'channel'];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 100 &&
+        data.caseId is string && data.caseId.size() > 0 && data.caseId.size() <= 100 &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        data.trigger is string && data.trigger in [
+          'before_due', 'on_appointed_day', 'overdue_15_days', 'overdue_30_days', 'year_end_43bh'
+        ] &&
+        data.scheduledFor is string && data.scheduledFor.size() <= 50 &&
+        data.status is string && data.status in ['pending', 'approved', 'sent', 'cancelled'] &&
+        data.channel is string && data.channel in ['email', 'whatsapp', 'sms'] &&
+        (!('templateName' in data) || (data.templateName is string && data.templateName.size() <= 100)) &&
+        (!('approvedAt' in data) || data.approvedAt == null || (data.approvedAt is string && data.approvedAt.size() <= 50)) &&
+        (!('sentAt' in data) || data.sentAt == null || (data.sentAt is string && data.sentAt.size() <= 50)) &&
+        (!('idempotencyKey' in data) || (data.idempotencyKey is string && data.idempotencyKey.size() <= 128)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function areReminderImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'id', 'caseId', 'ownerUid', 'createdAt'
+      ]);
+    }
+
+    // --- Evidence ---
+    function isValidEvidence(data) {
+      let allowedKeys = [
+        'id', 'caseId', 'ownerUid', 'name', 'storagePath', 'sha256',
+        'mimeType', 'sizeBytes', 'magicBytesVerified', 'uploadedAt'
+      ];
+      let requiredKeys = [
+        'id', 'caseId', 'ownerUid', 'name', 'storagePath', 'sha256',
+        'mimeType', 'sizeBytes', 'magicBytesVerified', 'uploadedAt'
+      ];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.id is string && data.id.size() > 0 && data.id.size() <= 100 &&
+        data.caseId is string && data.caseId.size() > 0 && data.caseId.size() <= 100 &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+        data.storagePath is string && data.storagePath.size() > 0 && data.storagePath.size() <= 500 &&
+        data.sha256 is string && data.sha256.size() == 64 &&
+        data.mimeType is string && data.mimeType.size() <= 100 &&
+        data.sizeBytes is int && data.sizeBytes >= 0 && data.sizeBytes <= 10485760 &&
+        data.magicBytesVerified is bool &&
+        data.uploadedAt is string && data.uploadedAt.size() <= 50;
+    }
+
+    function areEvidenceImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'id', 'caseId', 'ownerUid', 'sha256', 'uploadedAt', 'storagePath'
+      ]);
+    }
+
+    // --- Invoices ---
+    function isValidInvoice(data) {
+      let allowedKeys = [
+        'id', 'ownerUid', 'orgId', 'buyerName', 'buyerGstin', 'invoiceNo',
+        'invoiceDate', 'acceptanceDate', 'deemedAcceptance', 'amountPaise',
+        'paidPaise', 'hasWrittenAgreement', 'agreedCreditDays', 'statutoryDueDate',
+        'statutoryRule', 'status', 'source', 'supplierName', 'createdAt'
+      ];
+      let requiredKeys = [
+        'ownerUid', 'buyerName', 'invoiceNo', 'invoiceDate', 'acceptanceDate', 'amountPaise'
+      ];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 100)) &&
+        (!('orgId' in data) || (data.orgId is string && data.orgId.size() <= 100)) &&
+        data.buyerName is string && data.buyerName.size() > 0 && data.buyerName.size() <= 200 &&
+        (!('buyerGstin' in data) || data.buyerGstin == null || (data.buyerGstin is string && data.buyerGstin.size() <= 15)) &&
+        data.invoiceNo is string && data.invoiceNo.size() > 0 && data.invoiceNo.size() <= 100 &&
+        data.invoiceDate is string && data.invoiceDate.size() <= 20 &&
+        data.acceptanceDate is string && data.acceptanceDate.size() <= 20 &&
+        (!('deemedAcceptance' in data) || data.deemedAcceptance is bool) &&
+        data.amountPaise is int && data.amountPaise > 0 &&
+        (!('paidPaise' in data) || (data.paidPaise is int && data.paidPaise >= 0)) &&
+        (!('hasWrittenAgreement' in data) || data.hasWrittenAgreement is bool) &&
+        (!('agreedCreditDays' in data) || data.agreedCreditDays == null || (data.agreedCreditDays is int && data.agreedCreditDays >= 0 && data.agreedCreditDays <= 365)) &&
+        (!('statutoryDueDate' in data) || (data.statutoryDueDate is string && data.statutoryDueDate.size() <= 20)) &&
+        (!('statutoryRule' in data) || (data.statutoryRule is string && data.statutoryRule.size() <= 100)) &&
+        (!('status' in data) || (data.status is string && data.status in ['pending', 'partially_paid', 'overdue', 'paid'])) &&
+        (!('supplierName' in data) || (data.supplierName is string && data.supplierName.size() <= 200)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50));
+    }
+
+    function areInvoiceImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerUid', 'createdAt', 'id']);
+    }
+
+    // --- Notices ---
+    function isValidNotice(data) {
+      let allowedKeys = [
+        'id', 'invoiceId', 'ownerUid', 'orgId', 'lang', 'bodyEn',
+        'finalBody', 'summaryLocal', 'fallbackUsed', 'disclaimer', 'createdAt'
+      ];
+      let requiredKeys = ['invoiceId', 'ownerUid', 'lang', 'bodyEn', 'finalBody', 'disclaimer', 'createdAt'];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.invoiceId is string && data.invoiceId.size() > 0 && data.invoiceId.size() <= 100 &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 100)) &&
+        (!('orgId' in data) || (data.orgId is string && data.orgId.size() <= 100)) &&
+        data.lang is string && data.lang in ['en', 'hi', 'gu'] &&
+        data.bodyEn is string && data.bodyEn.size() > 0 && data.bodyEn.size() <= 20000 &&
+        data.finalBody is string && data.finalBody.size() > 0 && data.finalBody.size() <= 20000 &&
+        (!('summaryLocal' in data) || data.summaryLocal == null || (data.summaryLocal is string && data.summaryLocal.size() <= 5000)) &&
+        (!('fallbackUsed' in data) || data.fallbackUsed is bool) &&
+        data.disclaimer is string && data.disclaimer.size() <= 500 &&
+        data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    function areNoticeImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerUid', 'invoiceId', 'createdAt', 'id']);
+    }
+
+    // --- Calls ---
+    function isValidCall(data) {
+      let allowedKeys = [
+        'id', 'invoiceId', 'ownerUid', 'orgId', 'consentGiven',
+        'transcript', 'promisedDate', 'createdAt'
+      ];
+      let requiredKeys = ['invoiceId', 'ownerUid', 'consentGiven', 'createdAt'];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.keys().hasAll(requiredKeys) &&
+        data.invoiceId is string && data.invoiceId.size() > 0 && data.invoiceId.size() <= 100 &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 100)) &&
+        (!('orgId' in data) || (data.orgId is string && data.orgId.size() <= 100)) &&
+        data.consentGiven is bool &&
+        (!('transcript' in data) || data.transcript == null || (data.transcript is string && data.transcript.size() <= 20000)) &&
+        (!('promisedDate' in data) || data.promisedDate == null || (data.promisedDate is string && data.promisedDate.size() <= 100)) &&
+        data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    function areCallImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerUid', 'invoiceId', 'createdAt', 'id']);
+    }
+
+    // --- Orgs ---
+    function isValidOrg(data) {
+      let allowedKeys = ['id', 'ownerUid', 'name', 'gstin', 'createdAt'];
+      return data.keys().hasOnly(allowedKeys) &&
+        data.ownerUid is string && data.ownerUid == request.auth.uid &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 100)) &&
+        (!('name' in data) || (data.name is string && data.name.size() <= 200)) &&
+        (!('gstin' in data) || data.gstin == null || (data.gstin is string && data.gstin.size() <= 15)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50));
+    }
+
+    function areOrgImmutableFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerUid', 'createdAt', 'id']);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
 
     // Users collection: user can only read/write their own profile
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && areImmutableUserFieldsUnchanged();
+      allow delete: if isOwner(userId);
     }
 
-    // Orgs collection: only owner can access
-    match /orgs/{orgId} {
-      allow read, update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+    // Cases collection: owner-only read and write
+    // Client writes must not alter computed fields (accruedInterestPaise, totalClaimPaise, daysOverdue)
+    match /cases/{caseId} {
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidCase(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidCase(request.resource.data) &&
+                      areCaseImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Case Events collection: append-only audit events stream
+    // MUST be strictly server-only write; clients may only read if they own the related case
+    match /caseEvents/{eventId} {
+      allow read: if isAuthenticated() && (
+        ('ownerUid' in resource.data && resource.data.ownerUid == request.auth.uid) ||
+        ('caseId' in resource.data && ownsRelatedCase(resource.data.caseId))
+      );
+      allow write: if false;
+    }
+
+    // Reminders collection: owner-only read/write
+    match /reminders/{reminderId} {
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidReminder(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidReminder(request.resource.data) &&
+                      areReminderImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Evidence collection: owner-only read/write
+    match /evidence/{evidenceId} {
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidEvidence(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidEvidence(request.resource.data) &&
+                      areEvidenceImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Inbound Emails collection: server-side only
+    match /inboundEmails/{emailId} {
+      allow read, write: if false;
+    }
+
+    // Rate Table collection: read allowed for authenticated users, write strictly server-only
+    match /rateTable/{rateId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
     }
 
     // Invoices collection: only owner can access
     match /invoices/{invoiceId} {
-      allow read, update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidInvoice(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidInvoice(request.resource.data) &&
+                      areInvoiceImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
     }
 
-    // Notices collection: only owner of invoice/notice can access
+    // Notices collection: only owner can access
     match /notices/{noticeId} {
-      allow read, update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidNotice(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidNotice(request.resource.data) &&
+                      areNoticeImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
     }
 
     // Calls collection: only owner can access
     match /calls/{callId} {
-      allow read, update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
-      allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidCall(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidCall(request.resource.data) &&
+                      areCallImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Orgs collection: only owner can access
+    match /orgs/{orgId} {
+      allow read: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidOrg(request.resource.data);
+      allow update: if isAuthenticated() &&
+                      resource.data.ownerUid == request.auth.uid &&
+                      request.resource.data.ownerUid == request.auth.uid &&
+                      isValidOrg(request.resource.data) &&
+                      areOrgImmutableFieldsUnchanged();
+      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
     }
 
     // Audit logs: written server-side only via Admin SDK, client access denied
     match /auditLogs/{logId} {
+      allow read, write: if false;
+    }
+
+    // Rate limits: server-side only via Admin SDK, client access denied
+    match /rateLimits/{limitId} {
+      allow read, write: if false;
+    }
+
+    // Catch-all default deny for any undefined collection or path
+    match /{document=**} {
       allow read, write: if false;
     }
   }
