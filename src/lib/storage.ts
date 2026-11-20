@@ -122,3 +122,22 @@ export async function deletePrivateDocument(storagePath: string): Promise<void> 
   const file = bucket.file(storagePath);
   await file.delete({ ignoreNotFound: true });
 }
+
+/**
+ * Deletes all private files uploaded by a user (uploads/{userId}/)
+ * Required for DPDP compliance right to erasure.
+ */
+export async function deleteUserStorageFolder(userId: string): Promise<number> {
+  const bucket = adminStorage.bucket();
+  const prefix = `uploads/${userId}/`;
+  const [files] = await bucket.getFiles({ prefix });
+
+  let deletedCount = 0;
+  for (const file of files) {
+    await file.delete({ ignoreNotFound: true });
+    deletedCount++;
+  }
+
+  return deletedCount;
+}
+

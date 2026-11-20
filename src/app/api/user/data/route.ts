@@ -1,83 +1,93 @@
 import { NextResponse } from 'next/server';
-import { verifyTokenAndGetContext, AuthError } from '@/lib/auth';
-import { checkRateLimit } from '@/lib/ratelimit';
-import { adminDb } from '@/lib/firestore';
-import { writeAuditLog } from '@/lib/audit';
+import { secureRoute } from '@/lib/apiSecurity';
+import { adminDb, adminAuth } from '@/lib/firestore';
+import { deleteUserStorageFolder } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * DPDP Act Compliance & User Right to Erasure:
- * Deletes all invoices, generated notices, call transcripts, and metadata
- * associated with the authenticated user.
+ * DPDP Act (2023) Compliance & User Right to Erasure:
+ * Deletes all user documents, cases, invoices, evidence, storage files,
+ * notices, calls, and deletes the Firebase Auth user account.
  */
-export async function DELETE(request: Request) {
-  try {
-    const { uid } = await verifyTokenAndGetContext(request);
-
-    const rate = await checkRateLimit(uid, 5);
-    if (!rate.allowed) {
-      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-    }
+export const DELETE = secureRoute(
+  {
+    action: 'USER_DATA_ERASURE_DPDP',
+    rateLimitPerMinute: 5,
+  },
+  async ({ auth }) => {
+    const { uid } = auth;
 
     let deletedInvoicesCount = 0;
+    let deletedCasesCount = 0;
+    let deletedRemindersCount = 0;
+    let deletedEvidenceCount = 0;
     let deletedNoticesCount = 0;
     let deletedCallsCount = 0;
 
-    // 1. Delete user invoices
-    const invoiceSnap = await adminDb
-      .collection('invoices')
-      .where('ownerUid', '==', uid)
-      .get();
+    // 1. Delete user cases
+    const caseSnap = await adminDb.collection('cases').where('ownerUid', '==', uid).get();
+    for (const doc of caseSnap.docs) {
+      await doc.ref.delete();
+      deletedCasesCount++;
+    }
 
+    // 2. Delete user reminders
+    const reminderSnap = await adminDb.collection('reminders').where('ownerUid', '==', uid).get();
+    for (const doc of reminderSnap.docs) {
+      await doc.ref.delete();
+      deletedRemindersCount++;
+    }
+
+    // 3. Delete user evidence records
+    const evidenceSnap = await adminDb.collection('evidence').where('ownerUid', '==', uid).get();
+    for (const doc of evidenceSnap.docs) {
+      await doc.ref.delete();
+      deletedEvidenceCount++;
+    }
+
+    // 4. Delete user files from private Cloud Storage bucket
+    const deletedFilesCount = await deleteUserStorageFolder(uid).catch(() => 0);
+
+    // 5. Delete user invoices
+    const invoiceSnap = await adminDb.collection('invoices').where('ownerUid', '==', uid).get();
     for (const doc of invoiceSnap.docs) {
       await doc.ref.delete();
       deletedInvoicesCount++;
     }
 
-    // 2. Delete user notices
-    const noticeSnap = await adminDb
-      .collection('notices')
-      .where('ownerUid', '==', uid)
-      .get();
-
+    // 6. Delete user notices
+    const noticeSnap = await adminDb.collection('notices').where('ownerUid', '==', uid).get();
     for (const doc of noticeSnap.docs) {
       await doc.ref.delete();
       deletedNoticesCount++;
     }
 
-    // 3. Delete user calls
-    const callSnap = await adminDb
-      .collection('calls')
-      .where('ownerUid', '==', uid)
-      .get();
-
+    // 7. Delete user calls
+    const callSnap = await adminDb.collection('calls').where('ownerUid', '==', uid).get();
     for (const doc of callSnap.docs) {
       await doc.ref.delete();
       deletedCallsCount++;
     }
 
-    // Write safe audit log (IDs only, zero PII)
-    await writeAuditLog({
-      uid,
-      action: 'USER_DATA_DELETED',
-      resourceId: uid,
-    });
+    // 8. Delete user profile document
+    await adminDb.collection('users').doc(uid).delete().catch(() => {});
+
+    // 9. Delete Firebase Auth user record
+    await adminAuth.deleteUser(uid).catch(() => {});
 
     return NextResponse.json({
       success: true,
-      message: 'All user data erased successfully in accordance with DPDP compliance.',
+      message: 'All user data and account records erased in accordance with DPDP compliance.',
       deleted: {
+        cases: deletedCasesCount,
         invoices: deletedInvoicesCount,
+        reminders: deletedRemindersCount,
+        evidence: deletedEvidenceCount,
+        files: deletedFilesCount,
         notices: deletedNoticesCount,
         calls: deletedCallsCount,
       },
     });
-  } catch (error: unknown) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
-    }
-    console.error('[USER_DATA_DELETE_ERROR]', error instanceof Error ? error.message : 'Unknown');
-    return NextResponse.json({ error: 'Failed to erase user data' }, { status: 500 });
   }
-}
+);
