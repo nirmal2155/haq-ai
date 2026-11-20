@@ -63,20 +63,20 @@ export function UploadCard({ onExtractionSuccess }: UploadCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+    <div className="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-6 space-y-5 backdrop-blur-xl">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center">
           <Upload className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900">Upload MSME Invoice / Delivery Challan</h3>
-          <p className="text-xs text-slate-500">Supports PDF, JPEG, PNG, WEBP (Max 8 MB)</p>
+          <h3 className="font-bold text-white text-base">Upload MSME Invoice or Delivery Challan</h3>
+          <p className="text-xs text-slate-400 font-mono">Supports PDF, JPEG, PNG, WEBP (Max 8 MB, verified by magic-bytes)</p>
         </div>
       </div>
 
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-lg p-8 text-center cursor-pointer transition-colors bg-slate-50 hover:bg-emerald-50/20"
+        className="border-2 border-dashed border-slate-800 hover:border-blue-500/60 rounded-2xl p-8 text-center cursor-pointer transition-all bg-slate-950/60 hover:bg-slate-900/40"
       >
         <input
           type="file"
@@ -87,24 +87,26 @@ export function UploadCard({ onExtractionSuccess }: UploadCardProps) {
         />
         {selectedFile ? (
           <div className="flex flex-col items-center gap-2">
-            <FileText className="w-8 h-8 text-emerald-600" />
-            <span className="text-sm font-medium text-slate-800">{selectedFile.name}</span>
-            <span className="text-xs text-slate-500">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+              <FileText className="w-6 h-6" />
+            </div>
+            <span className="text-sm font-bold text-white">{selectedFile.name}</span>
+            <span className="text-xs font-mono text-slate-400">
               {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
             </span>
           </div>
         ) : (
           <div className="space-y-2">
-            <Upload className="w-8 h-8 text-slate-400 mx-auto" />
-            <p className="text-sm text-slate-600 font-medium">Click to browse or drag and drop invoice</p>
-            <p className="text-xs text-slate-400">Strict magic-bytes validated server-side</p>
+            <Upload className="w-8 h-8 text-slate-500 mx-auto" />
+            <p className="text-sm text-slate-300 font-medium">Click to select document or drag &amp; drop</p>
+            <p className="text-xs font-mono text-slate-500">Magic-bytes inspected &amp; encrypted in private cloud storage</p>
           </div>
         )}
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2 text-xs text-red-700">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-2.5 text-xs text-red-300 font-mono">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
           <span>{error}</span>
         </div>
       )}
@@ -113,14 +115,14 @@ export function UploadCard({ onExtractionSuccess }: UploadCardProps) {
         <button
           onClick={handleUpload}
           disabled={isUploading}
-          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-medium rounded-lg shadow transition flex items-center justify-center gap-2 text-sm"
+          className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-wider min-h-[44px]"
         >
           {isUploading ? (
-            <>Processing Document with Google AI...</>
+            <>Processing Document with Google Gemini Multimodal...</>
           ) : (
             <>
               <CheckCircle2 className="w-4 h-4" />
-              Analyze & Extract Invoice Fields
+              Analyze &amp; Extract Invoice Fields
             </>
           )}
         </button>

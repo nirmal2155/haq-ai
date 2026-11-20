@@ -28,21 +28,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-xl border border-slate-200 shadow-sm space-y-6 text-center">
-      <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
+    <div className="max-w-md mx-auto my-12 p-8 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl space-y-6 text-center backdrop-blur-xl">
+      <div className="w-12 h-12 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto">
         <Lock className="w-6 h-6" />
       </div>
 
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold text-slate-900">Sign in to Haq AI</h1>
-        <p className="text-xs text-slate-500">
-          Enforce statutory payment rights under MSMED Act 2006
+        <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+          Secure Authentication
+        </div>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Sign in to Haq AI Studio</h1>
+        <p className="text-xs text-slate-400">
+          Enforce statutory payment rights under MSMED Act 2006 &amp; Section 43B(h)
         </p>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-center gap-2 text-left">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-300 flex items-center gap-2 text-left font-mono">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
           <span>{error}</span>
         </div>
       )}
@@ -51,22 +54,22 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-semibold rounded-lg shadow transition flex items-center justify-center gap-2 text-sm"
+          className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-wider min-h-[44px]"
         >
           <LogIn className="w-4 h-4" />
-          {loading ? 'Signing In...' : 'Sign In with Google'}
+          {loading ? 'Authenticating...' : 'Sign In with Google Account'}
         </button>
 
         <button
           onClick={handleDemoSignIn}
-          className="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-semibold rounded-lg transition text-xs"
+          className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white font-mono text-xs rounded-xl transition min-h-[40px]"
         >
-          Explore Demo Mode (Pre-loaded Invoices)
+          Explore Studio Demo Mode (Instant Access)
         </button>
       </div>
 
-      <p className="text-[11px] text-slate-400">
-        By signing in, you agree that Haq AI is a drafting & decision-support tool, not legal advice.
+      <p className="text-[11px] text-slate-500 italic">
+        Draft only. Haq AI produces calculations &amp; drafts, not legal advice. Review with a CA/lawyer.
       </p>
     </div>
   );

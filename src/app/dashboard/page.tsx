@@ -137,37 +137,43 @@ export default function SupplierDashboardPage() {
       {/* Header and Language Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
+              Supplier Claims Portfolio
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             {t.nav_dashboard}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
             {t.app_subtitle}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* EN / HI / GU Language Toggle */}
-          <div className="inline-flex rounded-lg border border-slate-300 p-0.5 bg-slate-100 text-xs font-semibold">
+          <div className="inline-flex rounded-xl border border-slate-800 p-1 bg-slate-900/90 text-xs font-semibold">
             <button
               onClick={() => setLang('en')}
-              className={`px-2.5 py-1 rounded-md transition ${
-                lang === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-lg transition ${
+                lang === 'en' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
               English
             </button>
             <button
               onClick={() => setLang('hi')}
-              className={`px-2.5 py-1 rounded-md transition ${
-                lang === 'hi' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-lg transition ${
+                lang === 'hi' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
               हिंदी
             </button>
             <button
               onClick={() => setLang('gu')}
-              className={`px-2.5 py-1 rounded-md transition ${
-                lang === 'gu' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-lg transition ${
+                lang === 'gu' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
               ગુજરાતી
@@ -176,7 +182,7 @@ export default function SupplierDashboardPage() {
 
           <Link
             href="/invoices/new"
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow flex items-center gap-1.5 transition"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/20 flex items-center gap-1.5 transition min-h-[38px]"
           >
             <Plus className="w-4 h-4" />
             <span>{t.nav_new_invoice}</span>
@@ -186,123 +192,134 @@ export default function SupplierDashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 shadow-xl space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-mono font-semibold text-slate-400 uppercase tracking-wider">
               {t.total_overdue}
             </span>
-            <Clock className="w-4 h-4 text-red-500" />
+            <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
+              <Clock className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-white">
             {formatPaiseToINR(totalOverduePrincipal)}
           </div>
-          <span className="text-[11px] text-slate-400">Principal dues past statutory limit</span>
+          <span className="text-[11px] text-slate-400 block">Principal dues past statutory limit</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-slate-900/90 p-5 rounded-2xl border border-emerald-500/20 shadow-xl space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">
               {t.total_interest}
             </span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <TrendingUp className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-emerald-600">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-400">
             {formatPaiseToINR(totalAccruedInterest)}
           </div>
-          <span className="text-[11px] text-slate-400">Compounded monthly at 3× RBI rate</span>
+          <span className="text-[11px] text-slate-400 block">Compounded monthly at 3× RBI rate</span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+        <div className="bg-slate-900/90 p-5 rounded-2xl border border-blue-500/20 shadow-xl space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-mono font-semibold text-blue-400 uppercase tracking-wider">
               Total Statutory Claim
             </span>
-            <CheckCircle2 className="w-4 h-4 text-blue-600" />
+            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-blue-950">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-white">
             {formatPaiseToINR(totalClaim)}
           </div>
-          <span className="text-[11px] text-slate-400">Enforceable under MSMED Section 15-18</span>
+          <span className="text-[11px] text-slate-400 block">Enforceable under MSMED ss. 15-18</span>
         </div>
       </div>
 
       {/* Invoices List / Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-          <h2 className="font-bold text-sm text-slate-900">
-            Overdue Invoices (Sorted by Accrued Interest)
-          </h2>
-          <span className="text-xs text-slate-500">
+      <div className="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl">
+        <div className="px-5 py-4 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="font-bold text-sm text-slate-200">
+              Overdue Invoices (Ranked by Statutory Interest)
+            </h2>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              MSMED s.16 Enforced
+            </span>
+          </div>
+          <span className="text-xs font-mono text-slate-400">
             {invoices.length} Registered Invoices
           </span>
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-slate-500 space-y-2">
-            <Loader2 className="w-6 h-6 animate-spin text-emerald-600 mx-auto" />
-            <p className="text-xs font-medium">Computing statutory interest and dues...</p>
+          <div className="p-16 text-center text-slate-400 space-y-3">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-400 mx-auto" />
+            <p className="text-xs font-medium font-mono">Computing statutory interest and dues...</p>
           </div>
         ) : invoices.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <p className="text-sm text-slate-600 font-medium">No invoices registered yet.</p>
+          <div className="p-16 text-center space-y-4">
+            <p className="text-sm text-slate-300 font-medium">No invoices registered yet.</p>
             <Link
               href="/invoices/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition"
             >
               <Plus className="w-4 h-4" />
               Upload First Invoice
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-800">
             {invoices.map((inv) => (
               <div
                 key={inv.id}
-                className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition"
+                className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-800/30 transition-all"
               >
                 {/* Details */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-sm">{inv.buyerName}</span>
-                    <span className="text-xs font-mono px-2 py-0.5 bg-slate-100 rounded text-slate-600">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-slate-100 text-sm">{inv.buyerName}</span>
+                    <span className="text-xs font-mono px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">
                       #{inv.invoiceNo}
                     </span>
                     {inv.daysOverdue > 0 ? (
-                      <span className="px-2 py-0.5 bg-red-100 text-red-800 text-[10px] font-bold rounded-full">
+                      <span className="px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold font-mono rounded-full">
                         {inv.daysOverdue} {t.days_overdue}
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
+                      <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold font-mono rounded-full">
                         Within Term
                       </span>
                     )}
                   </div>
 
-                  <div className="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
-                    <span>Due Date: <strong>{inv.statutoryDueDate}</strong></span>
-                    <span>Principal: <strong>{formatPaiseToINR(inv.amountPaise)}</strong></span>
+                  <div className="text-xs text-slate-400 flex flex-wrap gap-x-5 gap-y-1">
+                    <span>Due Date: <strong className="text-slate-300 font-mono">{inv.statutoryDueDate}</strong></span>
+                    <span>Principal: <strong className="text-slate-300 font-mono">{formatPaiseToINR(inv.amountPaise)}</strong></span>
                     {inv.daysOverdue > 0 && (
-                      <span className="text-emerald-700 font-bold">
-                        Accrued 3x Interest: {formatPaiseToINR(inv.accruedInterestPaise)}
+                      <span className="text-emerald-400 font-bold font-mono">
+                        Accrued 3× Interest: {formatPaiseToINR(inv.accruedInterestPaise)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* One-Click Action Buttons */}
+                {/* Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0">
                   <Link
                     href={`/invoices/${inv.id}/notice`}
-                    className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold shadow transition flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5 min-h-[36px]"
                     title={t.action_generate_notice}
                   >
-                    <FileText className="w-3.5 h-3.5" />
+                    <FileText className="w-3.5 h-3.5 text-blue-400" />
                     <span>{t.action_generate_notice}</span>
                   </Link>
 
                   <Link
                     href={`/invoices/${inv.id}/samadhaan`}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-semibold shadow transition flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5 min-h-[36px]"
                     title={t.action_samadhaan_kit}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -311,7 +328,7 @@ export default function SupplierDashboardPage() {
 
                   <Link
                     href={`/invoices/${inv.id}/call`}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold shadow transition flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5 min-h-[36px]"
                     title={t.action_voice_call}
                   >
                     <Phone className="w-3.5 h-3.5" />

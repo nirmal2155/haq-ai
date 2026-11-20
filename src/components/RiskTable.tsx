@@ -38,122 +38,137 @@ export function RiskTable({ invoices, buyerName }: RiskTableProps) {
     <div className="space-y-6">
       {/* 43B(h) Summary KPI Exposure Indicator */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-red-200 shadow-sm p-6 space-y-2">
+        <div className="bg-slate-900/90 rounded-2xl border border-red-500/30 shadow-xl p-5 space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-red-700 uppercase tracking-wider">
-              Section 43B(h) Tax Disallowance Risk
+            <span className="text-[11px] font-mono font-bold text-red-400 uppercase tracking-wider">
+              Section 43B(h) Disallowance Risk
             </span>
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
+              <AlertTriangle className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-white">
             {formatPaiseToINR(totalExposurePaise)}
           </div>
-          <p className="text-xs text-slate-500">
-            Unpaid MSME dues beyond statutory limit. Cannot be deducted as business expense until paid.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Unpaid MSME dues beyond statutory limit. Deductible only in the year payment is actually released.
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-amber-200 shadow-sm p-6 space-y-2">
+        <div className="bg-slate-900/90 rounded-2xl border border-amber-500/30 shadow-xl p-5 space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-              Statutory Compound Interest Liability
+            <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+              Compound Interest Accrued (s.16)
             </span>
-            <AlertCircle className="w-5 h-5 text-amber-600" />
+            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <AlertCircle className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-amber-400">
             {formatPaiseToINR(totalInterestExposurePaise)}
           </div>
-          <p className="text-xs text-slate-500">
-            Compound interest payable at 3× RBI Bank Rate under Section 16 of MSMED Act.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Compound interest payable at 3× RBI Bank Rate under Section 16 of the MSMED Act.
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-2">
+        <div className="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-5 space-y-2 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Total Invoices Under Review
+            <span className="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider">
+              Total Invoices Under Audit
             </span>
-            <CheckCircle className="w-5 h-5 text-blue-600" />
+            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <CheckCircle className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-white">
             {invoices.length} Invoices
           </div>
-          <p className="text-xs text-slate-500">
-            From verified Micro & Small registered suppliers.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Supplied by verified Micro &amp; Small manufacturing/service enterprises.
           </p>
         </div>
       </div>
 
       {/* Indicative Disclaimer Tooltip Box */}
-      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3 text-xs text-amber-900">
+      <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3 text-xs text-amber-200/90 backdrop-blur-sm">
         <InfoTooltip />
-        <div>
-          <span className="font-bold">Indicative Assessment Only: </span>
-          Section 43B(h) exposure is computed as decision-support for corporate buyers. It highlights unpaid invoices exceeding the statutory MSMED limits (15/45 days). This is indicative, not legal or tax advice. Consult your Chartered Accountant for corporate tax filings.
+        <div className="leading-relaxed">
+          <span className="font-bold text-amber-300">Statutory Tax &amp; Legal Context: </span>
+          Section 43B(h) exposure is computed deterministically for corporate buyers. An unpaid MSME bill beyond the legal limit is deductible only in the year it is actually paid, so the buyer faces a tax-timing and cash-flow cost. Review with a CA/lawyer before filing.
         </div>
       </div>
 
       {/* Invoices Risk Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-          <h3 className="font-bold text-sm text-slate-900">
-            MSME Supplier Dues & Statutory Due Date Matrix ({buyerName})
-          </h3>
-          <span className="text-xs text-slate-500">
-            Live evaluation as of {new Date().toISOString().split('T')[0]}
+      <div className="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl">
+        <div className="px-5 py-4 border-b border-slate-800 bg-slate-950/80 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-sm text-slate-200">
+              MSME Supplier Dues &amp; Appointed Day Matrix ({buyerName})
+            </h3>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              Live Evaluation
+            </span>
+          </div>
+          <span className="text-xs font-mono text-slate-400">
+            As of {new Date().toISOString().split('T')[0]}
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+              <tr className="bg-slate-950/90 text-slate-400 font-semibold border-b border-slate-800 font-mono text-[11px]">
                 <th className="p-3.5">Supplier Name</th>
                 <th className="p-3.5">Invoice #</th>
                 <th className="p-3.5">Acceptance Date</th>
                 <th className="p-3.5">Statutory Due Date</th>
                 <th className="p-3.5">Days Overdue</th>
                 <th className="p-3.5 text-right">Unpaid Principal</th>
-                <th className="p-3.5 text-right">Accrued 3x Interest</th>
+                <th className="p-3.5 text-right">Accrued 3× Interest</th>
                 <th className="p-3.5 text-center">43B(h) Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
+            <tbody className="divide-y divide-slate-800 font-medium">
               {invoices.map((inv) => (
                 <tr
                   key={inv.id}
-                  className={`hover:bg-slate-50 transition-colors ${
-                    inv.disallowedUnder43Bh ? 'bg-red-50/20' : ''
+                  className={`hover:bg-slate-800/40 transition-colors ${
+                    inv.disallowedUnder43Bh ? 'bg-red-500/5' : ''
                   }`}
                 >
-                  <td className="p-3.5 font-bold text-slate-900">{inv.supplierName}</td>
-                  <td className="p-3.5 font-mono text-slate-700">{inv.invoiceNo}</td>
-                  <td className="p-3.5 text-slate-600">{inv.acceptanceDate}</td>
-                  <td className="p-3.5 text-slate-800 font-semibold">{inv.statutoryDueDate}</td>
+                  <td className="p-3.5 font-bold text-white">{inv.supplierName}</td>
+                  <td className="p-3.5 font-mono text-slate-300">
+                    <span className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">
+                      {inv.invoiceNo}
+                    </span>
+                  </td>
+                  <td className="p-3.5 text-slate-400 font-mono">{inv.acceptanceDate}</td>
+                  <td className="p-3.5 text-slate-300 font-semibold font-mono">{inv.statutoryDueDate}</td>
                   <td className="p-3.5">
                     {inv.daysOverdue > 0 ? (
-                      <span className="px-2 py-0.5 bg-red-100 text-red-800 font-bold rounded-full">
+                      <span className="px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 font-bold font-mono rounded-full text-[10px]">
                         {inv.daysOverdue} days late
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">
+                      <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono rounded-full text-[10px]">
                         Within limit
                       </span>
                     )}
                   </td>
-                  <td className="p-3.5 text-right font-bold text-slate-900">
+                  <td className="p-3.5 text-right font-bold font-mono text-white">
                     {formatPaiseToINR(inv.unpaidPaise)}
                   </td>
-                  <td className="p-3.5 text-right text-emerald-700 font-bold">
+                  <td className="p-3.5 text-right text-emerald-400 font-bold font-mono">
                     {formatPaiseToINR(inv.accruedInterestPaise)}
                   </td>
                   <td className="p-3.5 text-center">
                     {inv.disallowedUnder43Bh ? (
-                      <span className="inline-flex items-center gap-1 text-red-700 font-bold bg-red-100 px-2.5 py-0.5 rounded-full text-[10px]">
+                      <span className="inline-flex items-center gap-1 text-red-400 font-bold bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 rounded-full text-[10px] font-mono">
                         Disallowed
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-100 px-2.5 py-0.5 rounded-full text-[10px]">
+                      <span className="inline-flex items-center gap-1 text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[10px] font-mono">
                         Allowed
                       </span>
                     )}

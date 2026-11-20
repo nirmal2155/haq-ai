@@ -48,122 +48,117 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24">
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg p-2 min-h-[44px] min-w-[44px]"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium text-base">Back</span>
-          </Link>
-          <h1 className="text-lg font-bold text-slate-900">{t.settings_title}</h1>
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-            {(['en', 'hi', 'gu'] as const).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors min-h-[36px] ${
-                  lang === l ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-blue-400" />
+            <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
+              System Configuration
+            </span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            {t.settings_title}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+            Manage language preferences and DPDP Act 2023 statutory privacy rights.
+          </p>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-6">
         {/* Language Selection Card */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-xl p-6 backdrop-blur-md">
           <div className="flex items-center gap-3 mb-4">
-            <Globe className="w-6 h-6 text-blue-600" />
+            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <Globe className="w-5 h-5" />
+            </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">{t.settings_language}</h2>
-              <p className="text-sm text-slate-500">Switch application interface language</p>
+              <h2 className="text-base font-bold text-white">{t.settings_language}</h2>
+              <p className="text-xs text-slate-400">Switch application interface language (English, हिंदी, ગુજરાતી)</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { code: 'en', label: 'English', sub: 'Default' },
-              { code: 'hi', label: 'हिंदी', sub: 'Devanagari' },
-              { code: 'gu', label: 'ગુજરાતી', sub: 'Gujarati' },
+              { code: 'en', label: 'English', sub: 'Statutory Default' },
+              { code: 'hi', label: 'हिंदी', sub: 'Devanagari Script' },
+              { code: 'gu', label: 'ગુજરાતી', sub: 'Gujarati Script' },
             ].map((item) => (
               <button
                 key={item.code}
                 onClick={() => setLang(item.code as 'en' | 'hi' | 'gu')}
-                className={`p-3 rounded-lg border text-left transition-all min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-600 ${
+                className={`p-4 rounded-xl border text-left transition-all min-h-[52px] ${
                   lang === item.code
-                    ? 'border-blue-600 bg-blue-50/50 text-blue-900 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                    ? 'border-blue-500 bg-blue-500/10 text-white ring-1 ring-blue-500/50'
+                    : 'border-slate-800 bg-slate-950/60 hover:bg-slate-800/60 text-slate-300'
                 }`}
               >
-                <div className="font-semibold text-base">{item.label}</div>
-                <div className="text-xs text-slate-500">{item.sub}</div>
+                <div className="font-bold text-sm text-white">{item.label}</div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5">{item.sub}</div>
               </button>
             ))}
           </div>
         </div>
 
         {/* DPDP Act Right to Erasure Card */}
-        <div className="bg-white rounded-xl border border-red-200 shadow-sm p-6 space-y-4">
+        <div className="bg-slate-900/90 rounded-2xl border border-red-500/30 shadow-xl p-6 space-y-4 backdrop-blur-md">
           <div className="flex items-start gap-3">
-            <ShieldAlert className="w-6 h-6 text-red-600 shrink-0 mt-0.5" />
+            <div className="p-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 shrink-0 mt-0.5">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
             <div>
-              <h2 className="text-base font-semibold text-red-950">{t.settings_delete_data}</h2>
-              <p className="text-sm text-slate-600 mt-1">
-                Under Section 12 of the Digital Personal Data Protection (DPDP) Act 2023, you have the right to permanent erasure of all personal data, invoices, cases, evidence, and account records.
+              <h2 className="text-base font-bold text-white">{t.settings_delete_data}</h2>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Under Section 12 of India&apos;s Digital Personal Data Protection (DPDP) Act 2023, you have the right to permanent erasure of all personal data, invoices, cases, evidence, and account records.
               </p>
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3.5 text-xs text-amber-200/90 leading-relaxed font-mono">
             <strong>Warning:</strong> {t.settings_delete_warning}
           </div>
 
           {errorMsg && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-xs text-red-300 font-mono">
               {errorMsg}
             </div>
           )}
 
           {deletionSuccess ? (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center gap-3 text-emerald-800">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3 text-emerald-300">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
-                <p className="font-medium text-sm">{t.settings_delete_success}</p>
-                <p className="text-xs text-emerald-600">Signing out and redirecting...</p>
+                <p className="font-semibold text-sm">{t.settings_delete_success}</p>
+                <p className="text-xs text-emerald-400 font-mono mt-0.5">Signing out and redirecting to studio...</p>
               </div>
             </div>
           ) : !confirmPrompt ? (
             <button
               onClick={() => setConfirmPrompt(true)}
-              className="w-full flex items-center justify-center gap-2 bg-white text-red-600 border border-red-300 hover:bg-red-50 font-semibold py-3 px-4 rounded-lg transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-red-600"
+              className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold py-3 px-4 rounded-xl transition-all min-h-[44px] text-xs font-mono uppercase tracking-wider"
             >
               <Trash2 className="w-4 h-4" />
               <span>{t.settings_delete_button}</span>
             </button>
           ) : (
-            <div className="space-y-3 bg-red-50 p-4 rounded-lg border border-red-300">
-              <p className="text-sm font-semibold text-red-900">
-                Are you absolutely sure? This action cannot be undone.
+            <div className="space-y-3 bg-red-500/10 p-4 rounded-xl border border-red-500/30">
+              <p className="text-xs font-semibold text-red-200">
+                Are you absolutely sure? This will execute complete cryptographic erasure under the DPDP Act.
               </p>
               <div className="flex gap-3">
                 <button
                   disabled={isDeleting}
                   onClick={handleDeleteAllData}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg min-h-[44px] text-sm transition-colors disabled:opacity-50"
+                  className="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-2.5 px-4 rounded-xl min-h-[40px] text-xs font-mono transition-colors disabled:opacity-50"
                 >
                   {isDeleting ? 'Erasing Everything...' : 'Yes, Delete Permanently'}
                 </button>
                 <button
                   disabled={isDeleting}
                   onClick={() => setConfirmPrompt(false)}
-                  className="flex-1 bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2.5 px-4 rounded-lg min-h-[44px] text-sm border border-slate-300 transition-colors"
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 px-4 rounded-xl min-h-[40px] text-xs font-mono border border-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
@@ -173,10 +168,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Legal Disclaimer */}
-        <p className="text-center text-xs text-slate-500 italic pt-4">
+        <p className="text-center text-[11px] text-slate-500 italic pt-2">
           {t.disclaimer}
         </p>
-      </main>
+      </div>
     </div>
   );
 }

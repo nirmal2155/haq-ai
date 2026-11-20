@@ -62,26 +62,28 @@ export default function BuyerRiskPage() {
       {/* Header & Buyer Org Selector */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 bg-amber-100 text-amber-800 rounded-lg">
-              <ShieldAlert className="w-5 h-5" />
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
+              CA &amp; CFO Exposure Matrix
             </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Corporate Buyer Risk Dashboard
-            </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Section 43B(h) Income Tax Exposure & MSMED Act Statutory Liability
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
+            <ShieldAlert className="w-6 h-6 text-amber-400" />
+            <span>Corporate Buyer Risk Studio</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Section 43B(h) Income Tax disallowance exposure &amp; MSMED Act Section 16 statutory compound liability
           </p>
         </div>
 
         {/* Corporate Buyer Entity Switcher */}
-        <div className="flex items-center gap-2 bg-white border border-slate-200 p-1 rounded-lg text-xs font-semibold shadow-sm">
-          <span className="text-slate-500 pl-2">Corporate Entity:</span>
+        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1.5 rounded-xl text-xs font-semibold shadow-lg">
+          <span className="text-slate-400 pl-2 font-mono text-[11px]">Audit Entity:</span>
           <select
             value={selectedBuyer}
             onChange={(e) => setSelectedBuyer(e.target.value as 'buyer_apex' | 'buyer_zenith')}
-            className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded font-semibold text-slate-900 focus:ring-2 focus:ring-amber-500 outline-none"
+            className="px-3 py-1.5 bg-slate-950 border border-slate-700/80 rounded-lg font-medium text-slate-200 focus:ring-2 focus:ring-amber-500/50 outline-none"
           >
             <option value="buyer_apex">Apex Motors India Ltd</option>
             <option value="buyer_zenith">Zenith Infrastructure Projects Ltd</option>
