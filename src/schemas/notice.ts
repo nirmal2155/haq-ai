@@ -52,7 +52,7 @@ Dear Sir / Madam,
 6. At the notified RBI Bank Rate of {{bankRatePercent}}% per annum, the applicable statutory interest rate is {{effectiveRatePercent}}% per annum compounded with monthly rests. As of {{noticeDate}}, the accrued statutory compound interest stands at {{interestRupeesFormatted}} (Paise: {{interestPaise}}), bringing the total statutory claim to {{totalRupeesFormatted}} (Paise: {{totalPaise}}).
 
 7. NOTE REGARDING SECTION 43B(h) OF THE INCOME TAX ACT, 1961:
-Failure to clear outstanding payments due to registered MSMEs within the statutory period under the MSMED Act results in disallowance of the entire expense deduction in your income tax computations for the assessment year.
+Under Section 43B(h) of the Income Tax Act, 1961, an unpaid MSME bill beyond the legal limit is deductible only in the year it is actually paid, so the buyer faces an immediate tax-timing and cash-flow cost.
 
 8. DEMAND:
 We hereby call upon you to remit the total outstanding amount of {{totalRupeesFormatted}} to our designated bank account within seven (7) days of receipt of this notice, failing which we shall be constrained to initiate formal conciliation and arbitration proceedings before the MSME Facilitation Council (MSEFC) via the MSME Samadhaan portal without further reference to you.

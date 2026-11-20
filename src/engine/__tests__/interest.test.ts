@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { computeInterest, LegalConfig, DEFAULT_LEGAL_CONFIG } from '../interest';
+import {
+  computeInterest,
+  LegalConfig,
+  DEFAULT_LEGAL_CONFIG,
+  getNotifiedBankRate,
+  RBI_BANK_RATE_TABLE,
+} from '../interest';
 import { rupeesToPaise, paiseToRupees, formatPaiseToINR } from '../money';
 
 describe('MSMED Act Statutory Interest Engine (Section 16)', () => {
@@ -191,6 +197,33 @@ describe('MSMED Act Statutory Interest Engine (Section 16)', () => {
       // 10,000,000 * 0.2025 / 365 = 5547.945... paise -> 5548 paise
       expect(res.effectiveAnnualRatePercent).toBe(20.25);
       expect(res.interestPaise).toBe(5548);
+    });
+  });
+
+  describe('Versioned RBI Bank Rate Table (Rule 5)', () => {
+    it('returns 6.75% for dates on or after 2023-02-08', () => {
+      const entry = getNotifiedBankRate('2024-01-01');
+      expect(entry.ratePercent).toBe(6.75);
+      expect(entry.effectiveDate).toBe('2023-02-08');
+      expect(entry.source).toContain('RBI');
+    });
+
+    it('returns 6.50% for dates between 2022-12-07 and 2023-02-07', () => {
+      const entry = getNotifiedBankRate('2023-01-15');
+      expect(entry.ratePercent).toBe(6.50);
+      expect(entry.effectiveDate).toBe('2022-12-07');
+    });
+
+    it('returns historical rate for dates in 2020', () => {
+      const entry = getNotifiedBankRate('2021-06-01');
+      expect(entry.ratePercent).toBe(4.25);
+    });
+
+    it('contains valid versioned entries in chronological descending order', () => {
+      expect(RBI_BANK_RATE_TABLE.length).toBeGreaterThanOrEqual(5);
+      for (let i = 0; i < RBI_BANK_RATE_TABLE.length - 1; i++) {
+        expect(RBI_BANK_RATE_TABLE[i].effectiveDate > RBI_BANK_RATE_TABLE[i + 1].effectiveDate).toBe(true);
+      }
     });
   });
 });

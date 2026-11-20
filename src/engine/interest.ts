@@ -8,6 +8,34 @@ export interface LegalConfig {
   maxAgreedDays: number; // 45
 }
 
+/**
+ * Versioned RBI Bank Rate Table with as-of dates and official sources.
+ * Conforms to Master Rule 5 & docs/LEGAL_ASSUMPTIONS.md
+ */
+export interface BankRateEntry {
+  effectiveDate: string; // YYYY-MM-DD
+  ratePercent: number;
+  source: string;
+}
+
+export const RBI_BANK_RATE_TABLE: BankRateEntry[] = [
+  { effectiveDate: '2023-02-08', ratePercent: 6.75, source: 'RBI Monetary Policy Statement / Sec 49' },
+  { effectiveDate: '2022-12-07', ratePercent: 6.50, source: 'RBI Monetary Policy Resolution Dec 2022' },
+  { effectiveDate: '2022-09-30', ratePercent: 6.15, source: 'RBI Monetary Policy Resolution Sep 2022' },
+  { effectiveDate: '2022-08-05', ratePercent: 5.65, source: 'RBI Monetary Policy Resolution Aug 2022' },
+  { effectiveDate: '2022-06-08', ratePercent: 5.15, source: 'RBI Monetary Policy Resolution Jun 2022' },
+  { effectiveDate: '2020-05-22', ratePercent: 4.25, source: 'RBI Monetary Policy Resolution May 2020' },
+];
+
+export function getNotifiedBankRate(asOfDate: string): BankRateEntry {
+  for (const entry of RBI_BANK_RATE_TABLE) {
+    if (asOfDate >= entry.effectiveDate) {
+      return entry;
+    }
+  }
+  return RBI_BANK_RATE_TABLE[RBI_BANK_RATE_TABLE.length - 1];
+}
+
 export const DEFAULT_LEGAL_CONFIG: LegalConfig = {
   bankRatePercent: 6.5,
   rateMultiplier: 3,
