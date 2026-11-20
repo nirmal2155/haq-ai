@@ -9,7 +9,7 @@ async function main() {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Startup Buildathon India 2026 — Haq AI (Tech Titans)</title>
+  <title>Startup Buildathon India 2026 — Haq AI (Tech Titan)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -488,7 +488,7 @@ async function main() {
         <div class="meta-box">
           <div class="meta-row">
             <div class="meta-label">Team Name:</div>
-            <div class="meta-value">Tech Titans</div>
+            <div class="meta-value">Tech Titan</div>
           </div>
           <div class="meta-row">
             <div class="meta-label">Team Size:</div>
@@ -1091,7 +1091,7 @@ async function main() {
         </p>
 
         <div style="margin-top: 24px; display: flex; gap: 20px; font-size: 11pt; font-weight: 600; color: #334155;">
-          <div><strong>Team:</strong> Tech Titans</div>
+          <div><strong>Team:</strong> Tech Titan</div>
           <div>•</div>
           <div><strong>Lead:</strong> Nirmal Sinh</div>
           <div>•</div>
@@ -1131,9 +1131,9 @@ async function main() {
   console.log('[BUILDATHON PPT] Wrote template HTML to:', htmlPath);
 
   // Render to PDF using Chrome Headless
-  const outPdfLocal = path.join(__dirname, '../public/Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf');
-  const outPdfDownloads = 'C:\\Users\\ASUS\\Downloads\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf';
-  const outPdfDesktop = 'C:\\Users\\ASUS\\OneDrive\\Desktop\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf';
+  const outPdfLocal = path.join(__dirname, '../public/Startup_Buildathon_India_2026_Haq_AI_Tech_Titan.pdf');
+  const outPdfDownloads = 'C:\\Users\\ASUS\\Downloads\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titan.pdf';
+  const outPdfDesktop = 'C:\\Users\\ASUS\\OneDrive\\Desktop\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titan.pdf';
 
   const browserPath = fs.existsSync('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe')
     ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
@@ -1160,6 +1160,15 @@ async function main() {
     console.log('[BUILDATHON PPT] Copied to Desktop:', outPdfDesktop);
   } catch (e) {
     console.warn('Could not copy to Desktop:', e.message);
+  }
+
+  // Also maintain Tech_Titans.pdf as an alias for backwards compatibility
+  try {
+    fs.copyFileSync(outPdfLocal, path.join(__dirname, '../public/Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf'));
+    fs.copyFileSync(outPdfLocal, 'C:\\Users\\ASUS\\Downloads\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf');
+    fs.copyFileSync(outPdfLocal, 'C:\\Users\\ASUS\\OneDrive\\Desktop\\Startup_Buildathon_India_2026_Haq_AI_Tech_Titans.pdf');
+  } catch (e) {
+    // ignore
   }
 
   const stats = fs.statSync(outPdfLocal);
