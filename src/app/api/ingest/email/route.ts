@@ -14,7 +14,7 @@ const MAX_EMAIL_BODY_SIZE = 10 * 1024 * 1024; // 10 MB total payload
  * Extracts userId from per-user alias address:
  * Format: invoices+{userId}@inbound.haqai.in or {userId}@inbound.haqai.in
  */
-export function extractUserIdFromAlias(recipientEmail: string): string | null {
+function extractUserIdFromAlias(recipientEmail: string): string | null {
   const clean = recipientEmail.trim().toLowerCase();
   const matchPlus = /invoices\+([a-zA-Z0-9_-]+)@/.exec(clean);
   if (matchPlus && matchPlus[1]) {
@@ -30,7 +30,7 @@ export function extractUserIdFromAlias(recipientEmail: string): string | null {
 /**
  * Verifies HMAC-SHA256 signature for incoming provider webhooks.
  */
-export function verifyEmailWebhookHmac(
+function verifyEmailWebhookHmac(
   rawBody: string,
   signatureHeader: string | null,
   secretKey: string
