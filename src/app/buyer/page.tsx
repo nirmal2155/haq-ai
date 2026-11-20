@@ -80,7 +80,7 @@ export default function BuyerRiskPage() {
           <span className="text-slate-500 pl-2">Corporate Entity:</span>
           <select
             value={selectedBuyer}
-            onChange={(e) => setSelectedBuyer(e.target.value as any)}
+            onChange={(e) => setSelectedBuyer(e.target.value as 'buyer_apex' | 'buyer_zenith')}
             className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded font-semibold text-slate-900 focus:ring-2 focus:ring-amber-500 outline-none"
           >
             <option value="buyer_apex">Apex Motors India Ltd</option>

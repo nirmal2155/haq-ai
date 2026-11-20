@@ -4,8 +4,10 @@ import React, { useState, useRef } from 'react';
 import { Upload, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/lib/useAuth';
 
+import { ExtractedInvoiceFormInput, ExtractedInvoiceSource } from './ReviewForm';
+
 interface UploadCardProps {
-  onExtractionSuccess: (extractedData: any, source: any) => void;
+  onExtractionSuccess: (extractedData: ExtractedInvoiceFormInput, source?: ExtractedInvoiceSource) => void;
 }
 
 export function UploadCard({ onExtractionSuccess }: UploadCardProps) {

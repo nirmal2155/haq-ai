@@ -112,8 +112,10 @@ export async function createLiveEphemeralToken(serverSystemInstruction: string) 
       },
     });
 
+    const tokenRes = res as unknown as { token?: string; name?: string };
+
     return {
-      token: (res as any).token || (res as any).name || 'token_generated',
+      token: tokenRes.token || tokenRes.name || 'token_generated',
       model: liveModel,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     };

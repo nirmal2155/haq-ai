@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import { UploadCard } from '@/components/UploadCard';
-import { ReviewForm } from '@/components/ReviewForm';
+import { ReviewForm, ExtractedInvoiceFormInput, ExtractedInvoiceSource } from '@/components/ReviewForm';
 
 export default function NewInvoicePage() {
-  const [extractedData, setExtractedData] = useState<any | null>(null);
-  const [sourceInfo, setSourceInfo] = useState<any | null>(null);
+  const [extractedData, setExtractedData] = useState<ExtractedInvoiceFormInput | null>(null);
+  const [sourceInfo, setSourceInfo] = useState<ExtractedInvoiceSource | null>(null);
 
-  const handleExtraction = (extracted: any, source: any) => {
+  const handleExtraction = (extracted: ExtractedInvoiceFormInput, source?: ExtractedInvoiceSource) => {
     setExtractedData(extracted);
-    setSourceInfo(source);
+    setSourceInfo(source || null);
   };
 
   return (
@@ -40,7 +40,7 @@ export default function NewInvoicePage() {
               Upload Different File
             </button>
           </div>
-          <ReviewForm initialData={extractedData} source={sourceInfo} />
+          <ReviewForm initialData={extractedData} source={sourceInfo || undefined} />
         </div>
       )}
     </div>

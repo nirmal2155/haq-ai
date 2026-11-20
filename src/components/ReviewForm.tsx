@@ -7,24 +7,28 @@ import { computeDueDate } from '@/engine/deadline';
 import { rupeesToPaise, formatPaiseToINR } from '@/engine/money';
 import { useAuth } from '@/lib/useAuth';
 
-interface ReviewFormProps {
-  initialData: {
-    buyerName: string;
-    buyerGstin: string | null;
-    invoiceNo: string;
-    invoiceDate: string;
-    acceptanceDate: string | null;
-    amountRupees: string;
-    hasWrittenAgreement: boolean;
-    agreedCreditDays: number | null;
-    fieldsNeedingReview: string[];
-    amountPaise: number;
-  };
-  source?: {
-    storagePath: string;
-    mime: string;
-    sha256: string;
-  };
+export interface ExtractedInvoiceFormInput {
+  buyerName: string;
+  buyerGstin: string | null;
+  invoiceNo: string;
+  invoiceDate: string;
+  acceptanceDate: string | null;
+  amountRupees: string;
+  hasWrittenAgreement: boolean;
+  agreedCreditDays: number | null;
+  fieldsNeedingReview: string[];
+  amountPaise: number;
+}
+
+export interface ExtractedInvoiceSource {
+  storagePath: string;
+  mime: string;
+  sha256: string;
+}
+
+export interface ReviewFormProps {
+  initialData: ExtractedInvoiceFormInput;
+  source?: ExtractedInvoiceSource;
 }
 
 export function ReviewForm({ initialData, source }: ReviewFormProps) {

@@ -1,4 +1,4 @@
-import { Case, CaseEvent } from '@/domain/types';
+import { Case, CaseEvent, StatutoryReminderEntity } from '@/domain/types';
 import { computeInterest } from '@/engine/interest';
 import { getBankRate } from '@/engine/rates';
 import { paiseToRupees, formatPaiseToINR } from '@/engine/money';
@@ -153,7 +153,7 @@ export function buildSamadhaanCopyKit(caseEntity: Case): SamadhaanCopyKit {
 export function generateEvidencePackHtml(params: {
   caseEntity: Case;
   events: CaseEvent[];
-  reminders: any[];
+  reminders: StatutoryReminderEntity[];
   rateRow: ReturnType<typeof getBankRate>;
 }): string {
   const { caseEntity, events, reminders, rateRow } = params;
@@ -258,7 +258,7 @@ export function generateEvidencePackHtml(params: {
 export async function createEvidencePack(params: {
   caseEntity: Case;
   events: CaseEvent[];
-  reminders: any[];
+  reminders: StatutoryReminderEntity[];
 }): Promise<EvidencePackResult> {
   const { caseEntity, events, reminders } = params;
 

@@ -103,6 +103,27 @@ describe('Prompt 5: Gemini AI Layer & Statutory Guardrails', () => {
       expect(check.matches).toBe(false);
       expect(check.missingInTarget).toContain('50000');
     });
+
+    it('extracts and normalizes Hindi (Devanagari) and Gujarati digits accurately', () => {
+      const englishNotice = 'Notice: Invoice 101 for Rs 50000 due in 15 days on 2024-01-20.';
+      // Hindi translation using Devanagari digits: १०१, ५००००, १५, २०२४-०१-२०
+      const hindiNoticeWithIndicDigits = 'सूचना: बिल १०१ राशि ५०००० देय १५ दिनों में २०२४-०१-२०.';
+      // Gujarati translation using Gujarati digits: ૧૦૧, ૫૦૦૦૦, ૧૫, ૨૦૨૪-૦૧-૨૦
+      const gujaratiNoticeWithIndicDigits = 'નોટિસ: બિલ ૧૦૧ રકમ ૫૦૦૦૦ ચૂકવવાપાત્ર ૧૫ દિવસમાં ૨૦૨૪-૦૧-૨૦.';
+
+      const sourceTokens = extractCriticalTokens(englishNotice);
+      const hindiTokens = extractCriticalTokens(hindiNoticeWithIndicDigits);
+      const gujaratiTokens = extractCriticalTokens(gujaratiNoticeWithIndicDigits);
+
+      expect(hindiTokens).toEqual(sourceTokens);
+      expect(gujaratiTokens).toEqual(sourceTokens);
+
+      const hindiMatch = verifyExactMultisetMatch(sourceTokens, hindiTokens);
+      const gujaratiMatch = verifyExactMultisetMatch(sourceTokens, gujaratiTokens);
+
+      expect(hindiMatch.matches).toBe(true);
+      expect(gujaratiMatch.matches).toBe(true);
+    });
   });
 
   describe('4. Live Voice with Ephemeral Token & Consent Gate', () => {

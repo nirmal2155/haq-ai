@@ -4,7 +4,7 @@ import { secureRoute } from '@/lib/apiSecurity';
 import { CaseService } from '@/services/cases';
 import { adminDb } from '@/lib/firestore';
 import { createEvidencePack } from '@/services/evidencePack';
-import { CaseEvent } from '@/domain/types';
+import { CaseEvent, StatutoryReminderEntity } from '@/domain/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,7 @@ export const GET = secureRoute(
       .collection('reminders')
       .where('caseId', '==', caseId)
       .get();
-    const reminders = remindersSnap.docs.map((d) => d.data());
+    const reminders = remindersSnap.docs.map((d) => d.data() as StatutoryReminderEntity);
 
     // 3. Generate Evidence Pack & Samadhaan Copy Kit
     const evidencePack = await createEvidencePack({

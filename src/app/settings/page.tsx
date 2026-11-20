@@ -95,7 +95,7 @@ export default function SettingsPage() {
             ].map((item) => (
               <button
                 key={item.code}
-                onClick={() => setLang(item.code as any)}
+                onClick={() => setLang(item.code as 'en' | 'hi' | 'gu')}
                 className={`p-3 rounded-lg border text-left transition-all min-h-[48px] focus-visible:ring-2 focus-visible:ring-blue-600 ${
                   lang === item.code
                     ? 'border-blue-600 bg-blue-50/50 text-blue-900 ring-1 ring-blue-600'

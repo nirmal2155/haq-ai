@@ -2,7 +2,7 @@ import { GoogleGenAI, FunctionDeclaration, Type } from '@google/genai';
 import { ASSISTANT_SYSTEM_PROMPT_V1 } from './prompts/v1';
 import { computeAppointedDay } from '@/engine/deadline';
 import { computeInterest } from '@/engine/interest';
-import { checkMsmeEligibility } from '@/engine/eligibility';
+import { checkMsmeEligibility, EnterpriseType, ActivityType } from '@/engine/eligibility';
 import { determineNextAction } from '@/engine/nextAction';
 import { paiseToRupees } from '@/engine/money';
 import { AppError } from '@/lib/errors';
@@ -119,9 +119,9 @@ export function executeEngineTool(name: string, args: Record<string, unknown>): 
     case 'checkEligibility': {
       const res = checkMsmeEligibility({
         isUdyamRegistered: Boolean(args.isUdyamRegistered),
-        enterpriseType: args.enterpriseType as any,
+        enterpriseType: String(args.enterpriseType || 'micro').toLowerCase() as EnterpriseType,
         udyamNumber: args.udyamNumber as string | undefined,
-        activityType: args.activityType as any,
+        activityType: args.activityType ? (String(args.activityType).toLowerCase() as ActivityType) : undefined,
       });
       return {
         eligible: res.eligible,

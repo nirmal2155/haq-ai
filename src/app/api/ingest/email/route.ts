@@ -40,6 +40,15 @@ function verifyEmailWebhookHmac(
   return crypto.timingSafeEqual(Buffer.from(expectedHmac), Buffer.from(signatureHeader.trim()));
 }
 
+interface InboundEmailPayload {
+  to?: string;
+  from?: string;
+  subject?: string;
+  attachmentBase64?: string;
+  attachmentMime?: string;
+  filename?: string;
+}
+
 export async function POST(request: Request) {
   const secretKey = process.env.EMAIL_WEBHOOK_SECRET || 'test-email-webhook-secret';
   const rawBody = await request.text();
@@ -56,9 +65,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid HMAC webhook signature' }, { status: 401 });
   }
 
-  let parsed: any;
+  let parsed: InboundEmailPayload;
   try {
-    parsed = JSON.parse(rawBody);
+    parsed = JSON.parse(rawBody) as InboundEmailPayload;
   } catch {
     return NextResponse.json({ error: 'Malformed JSON payload' }, { status: 400 });
   }

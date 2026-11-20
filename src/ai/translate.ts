@@ -15,25 +15,48 @@ export interface TranslationResult {
 }
 
 /**
+ * Normalizes Hindi (Devanagari) and Gujarati numerals to ASCII Western digits (0-9).
+ * Handles:
+ * - Devanagari numerals: ० (0) through ९ (9)
+ * - Gujarati numerals: ૦ (0) through ૯ (9)
+ * Example: "१५ दिवस" -> "15 दिवस", "૧૫ દિવસ" -> "15 દિવસ"
+ */
+export function normalizeIndicDigits(text: string): string {
+  const indicDigitMap: Record<string, string> = {
+    // Devanagari (Hindi) digits
+    '०': '0', '१': '1', '२': '2', '३': '3', '४': '4',
+    '५': '5', '६': '6', '७': '7', '८': '8', '९': '9',
+    // Gujarati digits
+    '૦': '0', '૧': '1', '૨': '2', '૩': '3', '૪': '4',
+    '૫': '5', '૬': '6', '૭': '7', '૮': '8', '૯': '9',
+  };
+
+  return text.replace(/[०-९૦-૯]/g, (digit) => indicDigitMap[digit] || digit);
+}
+
+/**
  * Extracts all critical statutory tokens:
  * - Dates (YYYY-MM-DD or DD/MM/YYYY)
  * - GSTINs (15-char)
  * - Decimal numbers & amounts (e.g. 100000, 6.75, 20.25)
  * - Integers (e.g. 15, 45, 2024)
+ * Supports and normalizes Devanagari (Hindi) and Gujarati numerals.
  */
 export function extractCriticalTokens(text: string): string[] {
+  // Normalize any Indic (Hindi/Gujarati) numerals to standard ASCII digits first
+  const normalizedText = normalizeIndicDigits(text);
   const tokens: string[] = [];
 
   // 1. Extract GSTINs
-  const gstinMatches = text.match(/[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/g) || [];
+  const gstinMatches = normalizedText.match(/[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/g) || [];
   gstinMatches.forEach((g) => tokens.push(g));
 
   // 2. Extract ISO Dates (YYYY-MM-DD)
-  const dateMatches = text.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
+  const dateMatches = normalizedText.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
   dateMatches.forEach((d) => tokens.push(d));
 
   // 3. Extract all numeric values and amounts
-  const numberMatches = text.match(/\b\d+(?:[.,]\d+)*\b/g) || [];
+  const numberMatches = normalizedText.match(/\b\d+(?:[.,]\d+)*\b/g) || [];
   numberMatches.forEach((n) => {
     const cleanNum = n.replace(/,/g, '');
     tokens.push(cleanNum);
