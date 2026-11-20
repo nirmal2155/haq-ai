@@ -1,18 +1,41 @@
 import Decimal from 'decimal.js';
 
-// Configure Decimal for exact financial math
+/**
+ * Configure Decimal for exact financial math:
+ * - Precision: 28 digits (matches IEEE 754 decimal128 standard).
+ * - Rounding Rule: ROUND_HALF_UP (standard Indian commercial rounding:
+ *   values >= 0.5 round up to next integer paise, < 0.5 round down).
+ *
+ * All monetary amounts in the Haq AI core engine are stored, calculated,
+ * and passed as integer paise (1 Rupee = 100 Paise).
+ */
 Decimal.set({ precision: 28, rounding: Decimal.ROUND_HALF_UP });
+
+export const DECIMAL_CONFIG = {
+  precision: 28,
+  rounding: Decimal.ROUND_HALF_UP,
+  roundingModeName: 'ROUND_HALF_UP (Half away from zero / standard commercial rounding)',
+} as const;
 
 /**
  * Converts a rupee amount (string or number) into integer paise.
- * Strictly uses Decimal to avoid IEEE-754 floating point inaccuracies.
- * Example: "1234.56" -> 123456
+ * Strictly uses Decimal.js to avoid IEEE-754 floating point inaccuracies.
+ *
+ * Rounding Rule:
+ * Fractions of a paisa (sub-paise) are rounded to the nearest integer paisa
+ * using Decimal.ROUND_HALF_UP.
+ *
+ * Example:
+ * - "1234.56" -> 123456
+ * - "1234.565" -> 123457
+ * - "1234.564" -> 123456
  */
 export function rupeesToPaise(rupees: string | number): number {
   if (rupees === '' || rupees === null || rupees === undefined) {
     return 0;
   }
-  const d = new Decimal(rupees.toString().trim().replace(/,/g, ''));
+  const cleanStr = rupees.toString().trim().replace(/,/g, '');
+  const d = new Decimal(cleanStr);
   if (d.isNaN() || !d.isFinite()) {
     throw new Error(`Invalid rupee amount: ${rupees}`);
   }

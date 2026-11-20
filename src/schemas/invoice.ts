@@ -52,6 +52,22 @@ export const RawExtractionSchema = z.object({
 
 export type RawExtractedInvoice = z.infer<typeof RawExtractionSchema>;
 
+export interface InvoiceData {
+  id: string;
+  ownerUid: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  deliveryDate?: string;
+  acceptanceDate?: string;
+  agreedPaymentDays?: number | null;
+  totalAmountPaise: number;
+  paidAmountPaise?: number;
+  buyer: {
+    name: string;
+    gstin?: string;
+  };
+}
+
 export interface ConfirmedInvoicePayload {
   buyerName: string;
   buyerGstin: string | null;

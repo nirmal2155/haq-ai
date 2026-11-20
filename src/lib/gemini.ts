@@ -226,3 +226,8 @@ ${templateEn}
   }
 }
 
+// Aliases for typed service & AI scaffolding
+export const extractInvoiceWithGemini = extractInvoiceFromBuffer;
+export const translateNoticeWithGemini = generateNoticeTranslationAndSummary;
+
+
