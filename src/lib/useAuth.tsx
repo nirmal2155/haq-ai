@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { clientAuth } from '@/lib/firebaseClient';
 
 interface AuthContextValue {
@@ -9,6 +9,8 @@ interface AuthContextValue {
   loading: boolean;
   /** Returns Authorization header. Falls back to demo mode when user is null. */
   getAuthHeader: () => Promise<Record<string, string>>;
+  /** Signs the user out */
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -35,8 +37,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { Authorization: 'Bearer test-token-demo' };
   }, [user]);
 
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      await signOut(clientAuth);
+    } catch {
+      // Ignored if auth not initialized or offline
+    }
+    setUser(null);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, getAuthHeader }}>
+    <AuthContext.Provider value={{ user, loading, getAuthHeader, logout }}>
       {children}
     </AuthContext.Provider>
   );
